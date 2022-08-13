@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, Text } from "react-native"
+import { colors, getSpacing } from "../style"
 
 export type AudioFileProps = {
   file: string
@@ -15,11 +16,14 @@ function AudioFile(props: AudioFileProps) {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    padding: getSpacing(4),
     borderBottomWidth: 1,
+    borderColor: colors.bright.black,
   },
   text: {
-    fontSize: 16,
+    fontSize: getSpacing(4),
+    color: colors.normal.black,
+    fontFamily: 'Inter',
   }
 })
 
