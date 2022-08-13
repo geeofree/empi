@@ -55,7 +55,7 @@ function Player() {
             name="skip-forward"
             color={colors.bright.black}
             style={styles.icon}
-            onPress={playNext}
+            onPress={() => playNext({ shouldCycle: true })}
           />
         </View>
       </View>

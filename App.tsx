@@ -23,11 +23,8 @@ function App() {
     InterB: require('./assets/fonts/Inter-SemiBold.ttf'),
   })
 
-  const playback = useAudioPlayback()
-
-  useEffect(() => () => {
-    playback.stopPlayback()
-  }, [])
+  const { usePlaybackEffect } = useAudioPlayback()
+  usePlaybackEffect()
 
   if (!loaded) return null
 

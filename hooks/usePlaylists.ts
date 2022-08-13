@@ -44,7 +44,13 @@ const usePlaylistStore = create<PlaylistStore>((setState, getState) => ({
   getCurrentPlaylist: () => {
     const { currentPlaylist, playlists, songs } = getState()
     const playlist = get(currentPlaylist, playlists)
-    const playlistSongs = songs.filter(song => playlist?.songIDs?.some(songID => song.id === songID))
+    const playlistSongs = songs
+      .filter(song => playlist?.songIDs?.some(songID => song.id === songID))
+      .sort((a, b) => {
+        if (a.title < b.title) return -1
+        if (a.title > b.title) return 1
+        return 0
+      })
     const value = set<CurrentPlaylist>('songs', playlistSongs, playlist)
     return value
   },
@@ -97,6 +103,11 @@ const usePlaylistStore = create<PlaylistStore>((setState, getState) => ({
       uri: fileUri,
       artist: 'Unknown Artist',
     }))
+    .sort((a, b) => {
+      if (a.title < b.title) return -1
+      if (a.title > b.title) return 1
+      return 0
+    })
 
     const defaultPlaylistSongIDs = songs.map(song => song.id)
 

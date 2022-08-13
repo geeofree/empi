@@ -1,13 +1,22 @@
 import { Audio, AVPlaybackStatus, AVPlaybackStatusSuccess } from "expo-av";
 import { set } from 'lodash/fp'
+import { useEffect } from "react";
 import create from "zustand";
 import usePlaylists, { Song } from "./usePlaylists";
 
+export enum PLAYBACK_MODE_STATE {
+  PLAYLIST,
+  REPEAT_PLAYLIST,
+  REPEAT_SONG,
+  SHUFFLE_PLAYLIST,
+}
+
 type PlaybackModeIcon = "play" | "repeat" | "play-circle" | "shuffle"
 type PlaybackModeName = "Playlist" | "Repeat Playlist" | "Repeat Song" | "Shuffle Playlist"
-type PlaybackModeState = "PLAYLIST" | "REPEAT_PLAYLIST" | "REPEAT_SONG" | "SHUFFLE_PLAYLIST"
+type PlaybackModeState = keyof typeof PLAYBACK_MODE_STATE
 
 export type PlaybackMode = {
+  state: PlaybackModeState
   icon: PlaybackModeIcon
   name: PlaybackModeName
   next: PlaybackModeState
@@ -45,21 +54,25 @@ export type PlaybackStore = {
 
 const PLAYBACK_MODE: PlaybackModeMachine = {
   PLAYLIST: {
+    state: "PLAYLIST",
     icon: "play",
     name: "Playlist",
     next: "REPEAT_SONG"
   },
   REPEAT_SONG: {
+    state: "REPEAT_SONG",
     icon: "play-circle",
     name: "Repeat Song",
     next: "REPEAT_PLAYLIST"
   },
   REPEAT_PLAYLIST: {
+    state: "REPEAT_PLAYLIST",
     icon: "repeat",
     name: "Repeat Playlist",
     next: "SHUFFLE_PLAYLIST"
   },
   SHUFFLE_PLAYLIST: {
+    state: "SHUFFLE_PLAYLIST",
     icon: "shuffle",
     name: "Shuffle Playlist",
     next: "PLAYLIST"
@@ -93,6 +106,8 @@ const DEFAULT_SONG = {
   artist: '',
 }
 
+const getPlaybackModeState = (state: number): PlaybackModeState => PLAYBACK_MODE_STATE[state] as PlaybackModeState
+
 function useAudioPlayback() {
   const playback = usePlaybackStore()
   const playlist = usePlaylists()
@@ -116,12 +131,17 @@ function useAudioPlayback() {
   const togglePlayback = async () => {
     const { playbackInstance, status } = playback
     if (!(playbackInstance && status)) return
-    await playbackInstance.setStatusAsync({ shouldPlay: !status.isPlaying })
+    if (status.didJustFinish) {
+      await playbackInstance.replayAsync()
+    } else {
+      await playbackInstance.setStatusAsync({ shouldPlay: !status.isPlaying })
+    }
   }
 
   const isCurrentSong = (song: Song) => song.id === playback?.song?.id
 
-  const playNext = () => {
+  const playNext = (options: { shouldCycle: boolean }) => {
+    const { shouldCycle } = options
     const { getCurrentPlaylist } = playlist
     const { song } = playback
 
@@ -129,9 +149,11 @@ function useAudioPlayback() {
 
     const { songIDs } = getCurrentPlaylist()
     const currentSongIdx = songIDs.findIndex(songID => song.id === songID)
-    const nextSongIdx = (currentSongIdx + 1) % songIDs.length
+    let nextSongIdx = currentSongIdx + 1
+    nextSongIdx = shouldCycle ? nextSongIdx % songIDs.length : nextSongIdx
 
     const nextSongID = songIDs[nextSongIdx]
+    if (!nextSongID) return
 
     playAudio(nextSongID)
   }
@@ -152,6 +174,62 @@ function useAudioPlayback() {
     playAudio(prevSongID)
   }
 
+  const replayAudio = async () => {
+    const { playbackInstance, status } = playback
+    if (!(playbackInstance && status)) return
+    if (!status.didJustFinish) return
+    await playbackInstance.replayAsync()
+  }
+
+  const shufflePlay = () => {
+    const { song } = playback
+    const { getCurrentPlaylist } = playlist
+    const { songIDs } = getCurrentPlaylist()
+
+    if (!song) return
+
+    let nextSongIdx = Math.floor(Math.random() * songIDs.length)
+    let nextSongID = songIDs[nextSongIdx]
+
+    if (song.id === nextSongID) {
+      nextSongIdx = (nextSongIdx + 1) % songIDs.length
+      nextSongID = songIDs[nextSongIdx]
+    }
+
+    playAudio(nextSongID)
+  }
+
+  const handlePlaybackModes = () => {
+    if (!playback.status?.didJustFinish) return
+
+    if (playback.mode.state === getPlaybackModeState(PLAYBACK_MODE_STATE.REPEAT_SONG)) {
+      replayAudio()
+      return
+    }
+
+    if (playback.mode.state === getPlaybackModeState(PLAYBACK_MODE_STATE.PLAYLIST)) {
+      playNext({ shouldCycle: false })
+      return
+    }
+
+    if (playback.mode.state === getPlaybackModeState(PLAYBACK_MODE_STATE.REPEAT_PLAYLIST)) {
+      playNext({ shouldCycle: true })
+      return
+    }
+
+    if (playback.mode.state === getPlaybackModeState(PLAYBACK_MODE_STATE.SHUFFLE_PLAYLIST)) {
+      shufflePlay()
+      return
+    }
+  }
+
+  const usePlaybackEffect = () => {
+    useEffect(handlePlaybackModes, [playback.mode.state, playback.status?.didJustFinish])
+    useEffect(() => () => {
+      stopPlayback()
+    }, [])
+  }
+
   return {
     isCurrentSong,
     playAudio,
@@ -163,6 +241,7 @@ function useAudioPlayback() {
     togglePlayback,
     mode: playback.mode,
     switchPlaybackMode: playback.switchPlaybackMode,
+    usePlaybackEffect,
   }
 }
 
