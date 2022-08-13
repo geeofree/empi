@@ -1,28 +1,43 @@
-import { Text } from "react-native"
-import { get } from 'lodash/fp'
+import { StyleSheet, Text, View } from "react-native"
+import { useEffect } from "react"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 
 import { useAudioPlayback, usePlaylists } from "../hooks"
-import { Songs } from '../components'
 import { AppScreenParams } from "../App"
+import { Songs, MiniPlayer } from '../components'
 
 export type PlaylistProps = NativeStackScreenProps<AppScreenParams, 'Playlist'>
 
 function Playlist(props: PlaylistProps) {
   const { navigation } = props
-  const { playlists } = usePlaylists()
+  const playlist = usePlaylists()
   const playback = useAudioPlayback()
 
-  const allSongs = get('all', playlists)
+  const songs = playlist.getCurrentPlaylist()
 
-  if (!allSongs?.length) return <Text>No songs found.</Text>
+  useEffect(() => {
+    playlist.setDefaultPlaylist()
+  }, [])
 
-  const handlePlayAudio = (uri: string) => {
-    playback.playAudio(uri)
+  if (!songs?.length) return <Text>No songs found.</Text>
+
+  const handlePlayAudio = (songID: string) => {
+    playback.playAudio(songID)
     navigation.push('Playing')
   }
 
-  return <Songs songs={allSongs} onPlayAudio={handlePlayAudio} />
+  return (
+    <View style={styles.container}>
+      <Songs songs={songs} onPlayAudio={handlePlayAudio} />
+      <MiniPlayer />
+    </View>
+  )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+})
 
 export default Playlist

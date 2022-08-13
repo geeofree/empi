@@ -13,7 +13,8 @@ export const colors = {
     magenta: '#957fb8',
     cyan:    '#6a9589',
     white:   '#c8c093',
-    },
+    light:   '#f1f1f1',
+  },
 
   bright: {
     black:   '#727169',
@@ -24,6 +25,7 @@ export const colors = {
     magenta: '#938aa9',
     cyan:    '#7aa89f',
     white:   '#dcd7ba',
+    light:   '#f6f6f6',
   },
 
   selection: {
@@ -34,3 +36,8 @@ export const colors = {
 
 const spacings = Array(9).fill(null).map((_, i: number) => Math.pow(2, i))
 export const getSpacing = (ith: number) => spacings[ith]
+
+const baseFontSize = 8
+const fontSizeMultiple = 4
+const fontSizes = Array(11).fill(null).map((_, i: number) => baseFontSize + (fontSizeMultiple * i))
+export const getFontSize = (ith: number) => fontSizes[ith]

@@ -1,4 +1,4 @@
-import { FlatList, View } from "react-native"
+import { FlatList } from "react-native"
 
 import { Song as SongType } from "../hooks/usePlaylists"
 
@@ -19,13 +19,11 @@ function Songs(props: SongsProps) {
   const getKey = (song: SongType) => song.id
 
   return (
-    <View>
-      <FlatList
-        data={songs}
-        renderItem={renderSongs}
-        keyExtractor={getKey}
-      />
-    </View>
+    <FlatList
+      data={songs}
+      renderItem={renderSongs}
+      keyExtractor={getKey}
+    />
   )
 }
 
