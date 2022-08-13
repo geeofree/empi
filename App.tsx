@@ -3,6 +3,8 @@ import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useFonts } from 'expo-font'
 import { Playlist, Playing } from './screens';
+import { useEffect } from 'react';
+import { useAudioPlayback } from './hooks';
 
 export type AppScreenParams = {
   Playlist: undefined
@@ -23,6 +25,12 @@ function App() {
     Inter: require('./assets/fonts/Inter-Regular.ttf'),
     InterB: require('./assets/fonts/Inter-SemiBold.ttf'),
   })
+
+  const playback = useAudioPlayback()
+
+  useEffect(() => () => {
+    playback.stopPlayback()
+  }, [])
 
   if (!loaded) return null
 

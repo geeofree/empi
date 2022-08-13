@@ -1,19 +1,12 @@
-import { Audio, AVPlaybackStatus } from "expo-av";
+import { Audio, AVPlaybackStatus, AVPlaybackStatusSuccess } from "expo-av";
 import { set } from 'lodash/fp'
-import { useEffect } from "react";
 import create from "zustand";
 
 export type PlaybackStore = {
-  /** The URI of the file currently being played */
-  currentUri: string | null
-
   /** The playback status of the file being currently played */
-  status: AVPlaybackStatus | null
+  status: AVPlaybackStatusSuccess | null
 
   playbackInstance: Audio.Sound | null
-
-  /** Set the the current URI */
-  setCurrentUri: (uri: string) => void
 
   /** Set the playback status */
   setPlaybackStatus: (playbackStatus: AVPlaybackStatus) => void
@@ -23,12 +16,8 @@ export type PlaybackStore = {
 }
 
 const usePlaybackStore = create<PlaybackStore>((setState) => ({
-  currentUri: null,
   status: null,
   playbackInstance: null,
-  setCurrentUri: (uri) => {
-    setState(state => set('currentUri', uri, state))
-  },
   setPlaybackStatus: (playbackStatus) => {
     setState(state => set('status', playbackStatus, state))
   },
@@ -40,17 +29,13 @@ const usePlaybackStore = create<PlaybackStore>((setState) => ({
 function useAudioPlayback() {
   const playback = usePlaybackStore()
 
-  const playAudio = (uri: string) => {
-    playback.setCurrentUri(uri)
-  }
-
   const stopPlayback = async () => {
     if (playback.playbackInstance) {
       await playback.playbackInstance.unloadAsync()
     }
   }
 
-  const runPlayback = async (uri: string) => {
+  const playAudio = async (uri: string) => {
     await stopPlayback()
     await Audio.setAudioModeAsync({ staysActiveInBackground: true })
     const { sound } = await Audio.Sound.createAsync({ uri }, undefined, playback.setPlaybackStatus)
@@ -58,15 +43,7 @@ function useAudioPlayback() {
     playback.setPlaybackInstance(sound)
   }
 
-  useEffect(() => {
-    if (playback.currentUri) {
-      runPlayback(playback.currentUri)
-    }
-
-    return () => { stopPlayback() }
-  }, [playback.currentUri])
-
-  return { playAudio }
+  return { playAudio, status: playback.status, stopPlayback }
 }
 
 export default useAudioPlayback
