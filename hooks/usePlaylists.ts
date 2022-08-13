@@ -9,6 +9,7 @@ export type Song = {
   id: string
   title: string
   artist: string
+  uri: string
 }
 
 export type Playlists = {
@@ -41,7 +42,6 @@ const usePlaylistStore = create<PlaylistStore>((setState, getState) => ({
 
       playlist = get(playlistName, getState().playlists)
 
-      console.log('geo-playlist', playlist)
       const newPlaylists = uniqBy('title', playlist.concat(songOrSongs))
       const newState = set<PlaylistStore>(`playlists.${playlistName}`, newPlaylists, state)
 

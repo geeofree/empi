@@ -4,12 +4,13 @@ import { colors, getSpacing } from "../style"
 
 export type SongProps = {
   song: SongType
+  onPress: (uri: string) => void
 }
 
 function Song(props: SongProps) {
-  const { song } = props
+  const { song, onPress } = props
   return (
-    <Pressable style={styles.container}>
+    <Pressable style={styles.container} onPress={() => onPress(song.uri)}>
       <Text style={styles.title}>{song.title}</Text>
       <Text style={styles.artist}>{song.artist}</Text>
     </Pressable>
