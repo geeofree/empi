@@ -1,11 +1,19 @@
-import { StyleSheet, Text, View } from "react-native"
+import { Pressable, StyleSheet, Text, View } from "react-native"
 import Feather from "@expo/vector-icons/Feather"
 import { useAudioPlayback } from "../hooks"
 import { colors, getFontSize, getSpacing } from "../style"
 import { getPercent } from "../utils/math"
 
 function Player() {
-  const { status, song, togglePlayback, playNext, playPrev } = useAudioPlayback()
+  const {
+    mode,
+    status,
+    song,
+    togglePlayback,
+    playNext,
+    playPrev,
+    switchPlaybackMode,
+  } = useAudioPlayback()
 
   if (!(status && song)) return null
 
@@ -26,24 +34,30 @@ function Player() {
       </View>
 
       <View style={styles.controls}>
-        <Feather
-          name="skip-back"
-          color={colors.bright.black}
-          style={styles.icon}
-          onPress={playPrev}
-        />
-        <Feather
-          name={status.isPlaying ? "pause" : "play"}
-          style={styles.icon}
-          color={colors.normal.blue}
-          onPress={togglePlayback}
-        />
-        <Feather
-          name="skip-forward"
-          color={colors.bright.black}
-          style={styles.icon}
-          onPress={playNext}
-        />
+        <Pressable style={styles.modeControl} onPress={switchPlaybackMode}>
+          <Feather name={mode.icon} color={colors.normal.blue} style={styles.modeIcon} />
+          <Text style={styles.modeText}>{mode.name}</Text>
+        </Pressable>
+        <View style={styles.playControls}>
+          <Feather
+            name="skip-back"
+            color={colors.bright.black}
+            style={styles.icon}
+            onPress={playPrev}
+          />
+          <Feather
+            name={status.isPlaying ? "pause" : "play"}
+            style={styles.icon}
+            color={colors.normal.blue}
+            onPress={togglePlayback}
+          />
+          <Feather
+            name="skip-forward"
+            color={colors.bright.black}
+            style={styles.icon}
+            onPress={playNext}
+          />
+        </View>
       </View>
     </View>
   )
@@ -81,8 +95,30 @@ const styles = StyleSheet.create({
   controls: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     paddingVertical: getSpacing(5),
+  },
+  modeControl: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: getSpacing(3),
+    paddingHorizontal: getSpacing(4),
+    borderRadius: getSpacing(2),
+    backgroundColor: colors.normal.light,
+  },
+  modeIcon: {
+    fontSize: getFontSize(5),
+    paddingRight: getSpacing(3),
+  },
+  modeText: {
+    fontFamily: 'Inter',
+    fontSize: getFontSize(2),
+    color: colors.bright.black,
+  },
+
+  playControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   icon: {
     fontSize: getFontSize(7),

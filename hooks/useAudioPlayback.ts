@@ -3,7 +3,24 @@ import { set } from 'lodash/fp'
 import create from "zustand";
 import usePlaylists, { Song } from "./usePlaylists";
 
+type PlaybackModeIcon = "play" | "repeat" | "play-circle" | "shuffle"
+type PlaybackModeName = "Playlist" | "Repeat Playlist" | "Repeat Song" | "Shuffle Playlist"
+type PlaybackModeState = "PLAYLIST" | "REPEAT_PLAYLIST" | "REPEAT_SONG" | "SHUFFLE_PLAYLIST"
+
+export type PlaybackMode = {
+  icon: PlaybackModeIcon
+  name: PlaybackModeName
+  next: PlaybackModeState
+}
+
+export type PlaybackModeMachine = {
+  [key: string]: PlaybackMode
+}
+
 export type PlaybackStore = {
+  /** The current playback mode */
+  mode: PlaybackMode,
+
   /** The current song being played */
   song: Song | null
 
@@ -21,9 +38,36 @@ export type PlaybackStore = {
 
   /** Set the playback instance */
   setPlaybackInstance: (playbackInstance: Audio.Sound) => void
+
+  /** Switches playback modes */
+  switchPlaybackMode: () => void
 }
 
-const usePlaybackStore = create<PlaybackStore>((setState) => ({
+const PLAYBACK_MODE: PlaybackModeMachine = {
+  PLAYLIST: {
+    icon: "play",
+    name: "Playlist",
+    next: "REPEAT_SONG"
+  },
+  REPEAT_SONG: {
+    icon: "play-circle",
+    name: "Repeat Song",
+    next: "REPEAT_PLAYLIST"
+  },
+  REPEAT_PLAYLIST: {
+    icon: "repeat",
+    name: "Repeat Playlist",
+    next: "SHUFFLE_PLAYLIST"
+  },
+  SHUFFLE_PLAYLIST: {
+    icon: "shuffle",
+    name: "Shuffle Playlist",
+    next: "PLAYLIST"
+  }
+}
+
+const usePlaybackStore = create<PlaybackStore>((setState, getState) => ({
+  mode: PLAYBACK_MODE.PLAYLIST,
   song: null,
   status: null,
   playbackInstance: null,
@@ -36,6 +80,10 @@ const usePlaybackStore = create<PlaybackStore>((setState) => ({
   setPlaybackInstance: (playbackInstance) => {
     setState(state => set('playbackInstance', playbackInstance, state))
   },
+  switchPlaybackMode: () => {
+    const { mode } = getState()
+    setState(state => set('mode', PLAYBACK_MODE[mode.next], state))
+  }
 }))
 
 const DEFAULT_SONG = {
@@ -113,6 +161,8 @@ function useAudioPlayback() {
     stopPlayback,
     song: playback.song,
     togglePlayback,
+    mode: playback.mode,
+    switchPlaybackMode: playback.switchPlaybackMode,
   }
 }
 
