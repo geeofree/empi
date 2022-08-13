@@ -1,1 +1,1 @@
-export { default as AllSongs } from './AllSongs'
+export { default as Playlist } from './Playlist'

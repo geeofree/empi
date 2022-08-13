@@ -1,1 +1,1 @@
-export { default as AudioFiles } from './AudioFiles'
+export { default as Songs } from './Songs'

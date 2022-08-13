@@ -1,21 +1,29 @@
 import create from "zustand";
-import { set, get } from 'lodash/fp'
+import { set, get, uniqBy } from 'lodash/fp'
 import { StorageAccessFramework } from "expo-file-system";
 import { useEffect } from "react";
+import 'react-native-get-random-values'
+import { nanoid } from 'nanoid'
+
+export type Song = {
+  id: string
+  title: string
+  artist: string
+}
 
 export type Playlists = {
-  [key: string]: string[]
+  [key: string]: Song[]
 }
 
 export type PlaylistStore = {
   playlists: Playlists
   createPlaylist: (playlistName: string) => void
-  addToPlayList: (fileOrFiles: string | string[], playlistName: string) => void
+  addToPlayList: (songOrSongs: Song | Song[], playlistName: string) => void
 }
 
 const usePlaylistStore = create<PlaylistStore>((setState, getState) => ({
   playlists: {},
-  createPlaylist: (playlistName: string) => {
+  createPlaylist: (playlistName) => {
     setState(state => {
       const playlist = state.playlists[playlistName]
       if (playlist) return state
@@ -23,9 +31,9 @@ const usePlaylistStore = create<PlaylistStore>((setState, getState) => ({
       return newState
     })
   },
-  addToPlayList: (fileOrFiles: string | string[], playlistName: string) => {
+  addToPlayList: (songOrSongs, playlistName) => {
     setState(state => {
-      let playlist = get(`playlists.${playlistName}`, state)
+      let playlist = get(playlistName, state.playlists)
 
       if (playlist === undefined) {
         getState().createPlaylist(playlistName)
@@ -33,9 +41,8 @@ const usePlaylistStore = create<PlaylistStore>((setState, getState) => ({
 
       playlist = get(playlistName, getState().playlists)
 
-      if (playlist.includes(fileOrFiles)) return state
-
-      const newPlaylists = playlist.concat(fileOrFiles)
+      console.log('geo-playlist', playlist)
+      const newPlaylists = uniqBy('title', playlist.concat(songOrSongs))
       const newState = set<PlaylistStore>(`playlists.${playlistName}`, newPlaylists, state)
 
       return newState
@@ -55,11 +62,16 @@ function usePlaylists() {
 
       const fileUris = await StorageAccessFramework.readDirectoryAsync(uri)
 
-      const audioFiles = fileUris
-        .map(fileUri => decodeURIComponent(fileUri))
+      const songs = fileUris
         .filter(file => file.endsWith('.mp3'))
+        .map(fileUri => ({
+          id: nanoid(),
+          title: decodeURIComponent(fileUri).replace(/content.+\//, '').replace('.mp3', ''),
+          uri: fileUri,
+          artist: 'Unknown Artist',
+        }))
 
-      playlistStore.addToPlayList(audioFiles, 'all')
+      playlistStore.addToPlayList(songs, 'all')
     }
 
     getDefaultPlaylists()

@@ -2,16 +2,16 @@ import { Text } from "react-native"
 import { get } from 'lodash/fp'
 
 import { usePlaylists } from "../hooks"
-import { AudioFiles } from '../components'
+import { Songs } from '../components'
 
-function AllSongs() {
+function Playlist() {
   const { playlists } = usePlaylists()
 
   const allSongs = get('all', playlists)
 
   if (!allSongs?.length) return <Text>No songs found.</Text>
 
-  return <AudioFiles files={allSongs} />
+  return <Songs songs={allSongs} />
 }
 
-export default AllSongs
+export default Playlist
