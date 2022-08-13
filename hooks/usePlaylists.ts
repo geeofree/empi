@@ -1,7 +1,6 @@
 import create from "zustand";
-import { set, get, uniqBy } from 'lodash/fp'
+import { set, get } from 'lodash/fp'
 import { StorageAccessFramework } from "expo-file-system";
-import { useEffect } from "react";
 import 'react-native-get-random-values'
 import { nanoid } from 'nanoid'
 
@@ -12,60 +11,70 @@ export type Song = {
   uri: string
 }
 
-export type Playlists = {
-  [key: string]: string[]
+export type Playlist = {
+  name: string
+  songIDs: string[]
 }
+
+export type Playlists = {
+  [key: string]: Playlist
+}
+
+export type CurrentPlaylist = Playlist & { songs: Song[] }
 
 export type PlaylistStore = {
   currentPlaylist: string
   songs: Song[]
   playlists: Playlists
   setSongs: (songs: Song[]) => void
-  createPlaylist: (playlistName: string) => void
-  addToPlayList: (songIDs: string[], playlistName: string) => void
+  createPlaylist: (playlistKey: string, playlistName: string) => void
+  addToPlayList: (songIDs: string[], playlistKey: string, playlistName: string) => void
   setDefaultPlaylist: () => void
-  getCurrentPlaylist: () => Song[]
-  setCurrentPlaylist: (playlistName: string) => void
+  getCurrentPlaylist: () => CurrentPlaylist
+  setCurrentPlaylist: (playlistKey: string) => void
 }
 
-export const DEFAULT_PLAYLIST = 'default'
+export const DEFAULT_PLAYLIST_KEY = 'default'
+const DEFAULT_PLAYLIST_NAME = 'All Songs'
 
 const usePlaylistStore = create<PlaylistStore>((setState, getState) => ({
-  currentPlaylist: DEFAULT_PLAYLIST,
+  currentPlaylist: DEFAULT_PLAYLIST_KEY,
   songs: [],
   playlists: {},
   getCurrentPlaylist: () => {
     const { currentPlaylist, playlists, songs } = getState()
-    const playlist = get(currentPlaylist, playlists) || []
-    const playlistSongs = songs.filter(song => playlist.some(songID => song?.id === songID))
-    return playlistSongs
+    const playlist = get(currentPlaylist, playlists)
+    const playlistSongs = songs.filter(song => playlist?.songIDs?.some(songID => song.id === songID))
+    const value = set<CurrentPlaylist>('songs', playlistSongs, playlist)
+    return value
   },
-  setCurrentPlaylist: (playlistName) => {
-    setState(state => set('currentPlaylist', playlistName, state))
+  setCurrentPlaylist: (playlistKey) => {
+    setState(state => set('currentPlaylist', playlistKey, state))
   },
   setSongs: (songs) => {
     setState(state => set('songs', songs, state))
   },
-  createPlaylist: (playlistName) => {
+  createPlaylist: (playlistKey, playlistName) => {
     setState(state => {
-      const playlist = get(playlistName, state.playlists)
+      const playlist = get(playlistKey, state.playlists)
       if (playlist) return state
-      const newState = set<PlaylistStore>(`playlists.${playlistName}`, [], state)
+      const DEFAULT_PLAYLIST: Playlist = { name: playlistName, songIDs: [] }
+      const newState = set<PlaylistStore>(`playlists.${playlistKey}`, DEFAULT_PLAYLIST, state)
       return newState
     })
   },
-  addToPlayList: (songIDs, playlistName) => {
+  addToPlayList: (songIDs, playlistKey, playlistName) => {
     setState(state => {
-      let playlist = get(playlistName, state.playlists)
+      let playlist = get(playlistKey, state.playlists)
 
       if (!playlist) {
-        getState().createPlaylist(playlistName)
+        getState().createPlaylist(playlistKey, playlistName)
       }
 
-      playlist = get(playlistName, getState().playlists)
+      playlist = get(playlistKey, getState().playlists)
 
-      const newPlaylist = playlist.concat(songIDs)
-      const newState = set(`playlists.${playlistName}`, newPlaylist, state)
+      const newPlaylistSongs = playlist.songIDs.concat(songIDs)
+      const newState = set(`playlists.${playlistKey}.songIDs`, newPlaylistSongs, getState())
 
       return newState
     })
@@ -92,7 +101,7 @@ const usePlaylistStore = create<PlaylistStore>((setState, getState) => ({
     const defaultPlaylistSongIDs = songs.map(song => song.id)
 
     getState().setSongs(songs)
-    getState().addToPlayList(defaultPlaylistSongIDs, DEFAULT_PLAYLIST)
+    getState().addToPlayList(defaultPlaylistSongIDs, DEFAULT_PLAYLIST_KEY, DEFAULT_PLAYLIST_NAME)
   }
 }))
 

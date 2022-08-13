@@ -4,7 +4,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack"
 
 import { useAudioPlayback, usePlaylists } from "../hooks"
 import { AppScreenParams } from "../App"
-import { Songs, MiniPlayer } from '../components'
+import { Songs, MiniPlayer, PlaylistHeader } from '../components'
 
 export type PlaylistProps = NativeStackScreenProps<AppScreenParams, 'Playlist'>
 
@@ -13,7 +13,7 @@ function Playlist(props: PlaylistProps) {
   const playlist = usePlaylists()
   const playback = useAudioPlayback()
 
-  const songs = playlist.getCurrentPlaylist()
+  const { songs } = playlist.getCurrentPlaylist()
 
   useEffect(() => {
     playlist.setDefaultPlaylist()
@@ -28,6 +28,7 @@ function Playlist(props: PlaylistProps) {
 
   return (
     <View style={styles.container}>
+      <PlaylistHeader />
       <Songs songs={songs} onPlayAudio={handlePlayAudio} />
       <MiniPlayer />
     </View>

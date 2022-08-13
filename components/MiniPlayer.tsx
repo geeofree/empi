@@ -1,15 +1,11 @@
 import { useNavigation } from "@react-navigation/native"
-import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { StyleSheet, Text, View, Pressable } from "react-native"
 import FeatherIcon from '@expo/vector-icons/Feather'
 
-import { AppScreenParams } from "../App"
 import { useAudioPlayback } from "../hooks"
 import { colors, getFontSize, getSpacing } from "../style"
-
-const getPercent = (current: number = 0, max: number = 0) => max ? (current / max) * 100 : 0
-
-type Navigation = NativeStackNavigationProp<AppScreenParams>
+import { Navigation } from "../App"
+import { getPercent } from "../utils/math"
 
 function MiniPlayer() {
   const { song, status, togglePlayback } = useAudioPlayback()

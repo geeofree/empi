@@ -1,24 +1,21 @@
 import { StyleSheet, View, StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native'
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useFonts } from 'expo-font'
-import { Playlist, Playing } from './screens';
 import { useEffect } from 'react';
+
+import { Playlist, Playlists, Playing } from './screens';
 import { useAudioPlayback } from './hooks';
 
 export type AppScreenParams = {
   Playlist: undefined
+  Playlists: undefined
   Playing: undefined
 }
 
-const { Screen, Navigator } = createNativeStackNavigator<AppScreenParams>()
+export type Navigation = NativeStackNavigationProp<AppScreenParams>
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: StatusBar.currentHeight,
-  },
-});
+const { Screen, Navigator } = createNativeStackNavigator<AppScreenParams>()
 
 function App() {
   const [loaded] = useFonts({
@@ -37,13 +34,21 @@ function App() {
   return (
     <View style={styles.container}>
       <NavigationContainer>
-        <Navigator initialRouteName="Playlist">
+        <Navigator initialRouteName="Playlist" screenOptions={{ headerShown: false }}>
           <Screen name="Playlist" component={Playlist} />
+          <Screen name="Playlists" component={Playlists} />
           <Screen name="Playing" component={Playing} />
         </Navigator>
       </NavigationContainer>
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop: StatusBar.currentHeight,
+  },
+});
 
 export default App

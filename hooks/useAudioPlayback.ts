@@ -73,9 +73,42 @@ function useAudioPlayback() {
 
   const isCurrentSong = (song: Song) => song.id === playback?.song?.id
 
+  const playNext = () => {
+    const { getCurrentPlaylist } = playlist
+    const { song } = playback
+
+    if (!song) return
+
+    const { songIDs } = getCurrentPlaylist()
+    const currentSongIdx = songIDs.findIndex(songID => song.id === songID)
+    const nextSongIdx = (currentSongIdx + 1) % songIDs.length
+
+    const nextSongID = songIDs[nextSongIdx]
+
+    playAudio(nextSongID)
+  }
+
+  const playPrev = () => {
+    const { getCurrentPlaylist } = playlist
+    const { song } = playback
+
+    if (!song) return
+
+    const { songIDs } = getCurrentPlaylist()
+    const currentSongIdx = songIDs.findIndex(songID => song.id === songID)
+    let prevSongIdx = (currentSongIdx - 1)
+    prevSongIdx = prevSongIdx < 0 ? songIDs.length - 1 : prevSongIdx
+
+    const prevSongID = songIDs[prevSongIdx]
+
+    playAudio(prevSongID)
+  }
+
   return {
     isCurrentSong,
     playAudio,
+    playNext,
+    playPrev,
     status: playback.status,
     stopPlayback,
     song: playback.song,

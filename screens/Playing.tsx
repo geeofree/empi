@@ -1,15 +1,59 @@
-import { Text } from "react-native"
+import { StyleSheet, View, ScrollView, Dimensions, Text } from "react-native"
+import Feather from "@expo/vector-icons/Feather"
+import { Header, Player } from "../components"
 import { useAudioPlayback } from "../hooks"
+import { colors, getSpacing } from "../style"
+import { Fragment } from "react"
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  content: {
+    justifyContent: "center",
+    padding: getSpacing(4),
+    flex: 1,
+  },
+  cover: {
+    width: '100%',
+    height: Dimensions.get('window').height / 2,
+    backgroundColor: colors.normal.light,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  icon: {
+    fontSize: Dimensions.get('window').width * 0.3,
+    color: colors.bright.black,
+  },
+  coverText: {
+    fontFamily: 'Inter',
+    color: colors.bright.black,
+  },
+})
+
+const defaultAlbumCover = (
+  <Fragment>
+    <Feather name="music" style={styles.icon} />
+    <Text style={styles.coverText}>No Album Cover</Text>
+  </Fragment>
+)
 
 function Playing() {
-  const playback = useAudioPlayback()
+  const { status, song } = useAudioPlayback()
 
-  if (!playback.status) return <Text>Loading Song</Text>
+  if (!(status && song)) return null
 
-  let progress = playback.status.playableDurationMillis ? playback.status.positionMillis / playback.status.playableDurationMillis : 0
-  progress = progress * 100
-
-  return <Text style={{ padding: 16 }}>{progress}%</Text>
+  return (
+    <View style={styles.container}>
+      <Header title="Playing" />
+      <ScrollView>
+        <View style={styles.content}>
+          <View style={styles.cover}>{defaultAlbumCover}</View>
+          <Player />
+        </View>
+      </ScrollView>
+    </View>
+  )
 }
 
 export default Playing
