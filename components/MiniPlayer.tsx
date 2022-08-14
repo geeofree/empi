@@ -18,7 +18,11 @@ function MiniPlayer() {
   }
 
   return (
-    <Pressable style={styles.container} onPress={() => navigation.navigate('Playing')}>
+    <Pressable
+      style={styles.container}
+      onPress={() => navigation.navigate('Playing')}
+      android_ripple={styles.ripple}
+    >
       <View style={styles.progressBar}>
         <View style={[styles.progress, progress]} />
       </View>
@@ -44,6 +48,9 @@ function MiniPlayer() {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white'
+  },
+  ripple: {
+    color: colors.normal.light
   },
   progressBar: {
     height: getSpacing(3),
