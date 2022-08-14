@@ -24,7 +24,7 @@ function Songs(props: SongsProps) {
       onPress={() => onPress(song.id)}
       onLongPress={() => onLongPress(song.id)}
       android_ripple={styles.ripple}
-      delayLongPress={100}
+      delayLongPress={300}
     >
       {isSelecting ? (
         <MaterialIcons
