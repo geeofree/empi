@@ -41,7 +41,11 @@ function Playlist(props: PlaylistProps) {
   const headerRightContent = playlists.isSelecting ? (
     <View style={styles.rightHeaderContent}>
       {playlists.selected?.length === 1 ? (
-        <Feather name="edit" style={styles.icons} />
+        <Feather
+          name="edit"
+          style={styles.icons}
+          onPress={() => navigation.push("EditSong", { songID: playlists.selected && playlists.selected[0] })}
+        />
       ): null}
       {playlists.selected && playlists.selected.length > 0 ? (
         <Feather name="trash" style={styles.icons} />

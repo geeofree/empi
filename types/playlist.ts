@@ -21,6 +21,8 @@ export type PlaylistStore = {
   songs: Song[]
   selected: string[] | null
   playlists: Playlists
+  updateSong: (songID: string, newSongData: Pick<Song, 'title' | 'artist'>) => void
+  getSong: (songID: string | null) => Song | undefined
   setSongs: (songs: Song[]) => void
   createPlaylist: (playlistKey: string, playlistName: string) => void
   addToPlayList: (songIDs: string[], playlistKey: string, playlistName: string) => void

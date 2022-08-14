@@ -19,6 +19,19 @@ const usePlaylistStore = create<PlaylistStore>((setState, getState) => ({
   songs: [],
   playlists: {},
   selected: null,
+  updateSong: (songID, newSongData) => {
+    setState(state => {
+      const songIdx = state.songs.findIndex(song => song.id === songID)
+      if (songIdx < 0) return state
+      const newSongTitle = set(`songs.${songIdx}.title`, newSongData.title, state)
+      const newState = set(`songs.${songIdx}.artist`, newSongData.artist, newSongTitle)
+      return newState
+    })
+  },
+  getSong: (songID) => {
+    const { songs } = getState()
+    return songs.find(song => song.id === songID)
+  },
   getCurrentPlaylist: () => {
     const { currentPlaylist, playlists, songs } = getState()
     const playlist = get(currentPlaylist, playlists)
