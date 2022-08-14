@@ -138,7 +138,7 @@ function useAudioPlayback() {
     }
   }
 
-  const isCurrentSong = (song: Song) => song.id === playback?.song?.id
+  const isCurrentSong = (songID: string) => songID === playback?.song?.id
 
   const playNext = (options: { shouldCycle: boolean }) => {
     const { shouldCycle } = options

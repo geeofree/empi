@@ -22,14 +22,24 @@ function Playlist(props: PlaylistProps) {
   if (!songs?.length) return <Text>No songs found.</Text>
 
   const handlePlayAudio = (songID: string) => {
+    if (playback.isCurrentSong(songID)) return navigation.navigate('Playing')
     playback.playAudio(songID)
     navigation.push('Playing')
+  }
+
+  const handleSongOptions = (songID: string) => {
+    console.log('Handle song options', songID)
   }
 
   return (
     <View style={styles.container}>
       <PlaylistHeader />
-      <Songs songs={songs} onPlayAudio={handlePlayAudio} />
+      <Songs
+        songs={songs}
+        isCurrentSong={playback.isCurrentSong}
+        onPress={handlePlayAudio}
+        onLongPress={handleSongOptions}
+      />
       <MiniPlayer />
     </View>
   )

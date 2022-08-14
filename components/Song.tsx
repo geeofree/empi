@@ -1,25 +1,26 @@
 import { Pressable, StyleSheet, Text } from "react-native"
-import { useAudioPlayback } from "../hooks"
 import { Song as SongType } from "../hooks/usePlaylists"
 import { colors, getSpacing } from "../style"
 
 export type SongProps = {
   song: SongType
-  onPress: (uri: string) => void
+  isCurrentSong: boolean
+  onPress: (songID: string) => void
+  onLongPress: (songID: string) => void
 }
 
 function Song(props: SongProps) {
-  const { song, onPress } = props
-  const { isCurrentSong } = useAudioPlayback()
+  const { song, isCurrentSong, onPress, onLongPress } = props
 
   const isPlayingStyle = {
-    color: isCurrentSong(song) ? colors.normal.blue : colors.normal.black,
+    color: isCurrentSong ? colors.normal.blue : colors.normal.black,
   }
 
   return (
     <Pressable
       style={styles.container}
       onPress={() => onPress(song.id)}
+      onLongPress={() => onLongPress(song.id)}
       android_ripple={styles.ripple}
     >
       <Text style={[styles.title, isPlayingStyle]}>{song.title}</Text>
