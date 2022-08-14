@@ -1,8 +1,6 @@
-import { StyleSheet, View, StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useFonts } from 'expo-font'
-import { useEffect } from 'react';
 
 import { Playlist, Playlists, Playing } from './screens';
 import { useAudioPlayback } from './hooks';
@@ -29,23 +27,14 @@ function App() {
   if (!loaded) return null
 
   return (
-    <View style={styles.container}>
-      <NavigationContainer>
-        <Navigator initialRouteName="Playlist" screenOptions={{ headerShown: false }}>
-          <Screen name="Playlist" component={Playlist} />
-          <Screen name="Playlists" component={Playlists} />
-          <Screen name="Playing" component={Playing} />
-        </Navigator>
-      </NavigationContainer>
-    </View>
+    <NavigationContainer>
+      <Navigator initialRouteName="Playlist" screenOptions={{ headerShown: false }}>
+        <Screen name="Playlist" component={Playlist} />
+        <Screen name="Playlists" component={Playlists} />
+        <Screen name="Playing" component={Playing} />
+      </Navigator>
+    </NavigationContainer>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: StatusBar.currentHeight,
-  },
-});
 
 export default App

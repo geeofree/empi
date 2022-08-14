@@ -1,8 +1,9 @@
 import { Fragment, ReactNode } from "react"
-import { View, Text, StyleSheet } from "react-native"
+import { View, Text, StyleSheet, StatusBar } from "react-native"
 import Feather from "@expo/vector-icons/Feather"
-import { getFontSize, getSpacing } from "../style"
 import { useNavigation } from "@react-navigation/native"
+
+import { getFontSize, getSpacing } from "../style"
 import { Navigation } from "../App"
 
 export type HeaderProps = {
@@ -58,8 +59,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     flexDirection: 'row',
     alignItems: 'center',
+    paddingTop: (StatusBar.currentHeight || 0) + getSpacing(3),
   },
   title: {
+    fontFamily: 'Inter',
     flex: 2,
     fontSize: getFontSize(3),
   },
