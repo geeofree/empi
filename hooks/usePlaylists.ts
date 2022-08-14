@@ -3,39 +3,16 @@ import { set, get } from 'lodash/fp'
 import { StorageAccessFramework } from "expo-file-system";
 import 'react-native-get-random-values'
 import { nanoid } from 'nanoid'
-
-export type Song = {
-  id: string
-  title: string
-  artist: string
-  uri: string
-}
-
-export type Playlist = {
-  name: string
-  songIDs: string[]
-}
-
-export type Playlists = {
-  [key: string]: Playlist
-}
-
-export type CurrentPlaylist = Playlist & { songs: Song[] }
-
-export type PlaylistStore = {
-  currentPlaylist: string
-  songs: Song[]
-  playlists: Playlists
-  setSongs: (songs: Song[]) => void
-  createPlaylist: (playlistKey: string, playlistName: string) => void
-  addToPlayList: (songIDs: string[], playlistKey: string, playlistName: string) => void
-  setDefaultPlaylist: () => void
-  getCurrentPlaylist: () => CurrentPlaylist
-  setCurrentPlaylist: (playlistKey: string) => void
-}
+import { CurrentPlaylist, Playlist, PlaylistStore, Song } from "../types/playlist";
 
 export const DEFAULT_PLAYLIST_KEY = 'default'
 const DEFAULT_PLAYLIST_NAME = 'All Songs'
+
+function sortSongs(a: Song, b: Song): number {
+  if (a.title < b.title) return -1
+  if (a.title > b.title) return 1
+  return 0
+}
 
 const usePlaylistStore = create<PlaylistStore>((setState, getState) => ({
   currentPlaylist: DEFAULT_PLAYLIST_KEY,
@@ -45,12 +22,8 @@ const usePlaylistStore = create<PlaylistStore>((setState, getState) => ({
     const { currentPlaylist, playlists, songs } = getState()
     const playlist = get(currentPlaylist, playlists)
     const playlistSongs = songs
-      .filter(song => playlist?.songIDs?.some(songID => song.id === songID))
-      .sort((a, b) => {
-        if (a.title < b.title) return -1
-        if (a.title > b.title) return 1
-        return 0
-      })
+      .filter(song => playlist?.songIDs?.includes(song.id))
+      .sort(sortSongs)
     const value = set<CurrentPlaylist>('songs', playlistSongs, playlist)
     return value
   },
@@ -103,11 +76,7 @@ const usePlaylistStore = create<PlaylistStore>((setState, getState) => ({
       uri: fileUri,
       artist: 'Unknown Artist',
     }))
-    .sort((a, b) => {
-      if (a.title < b.title) return -1
-      if (a.title > b.title) return 1
-      return 0
-    })
+    .sort(sortSongs)
 
     const defaultPlaylistSongIDs = songs.map(song => song.id)
 

@@ -4,7 +4,7 @@ import Feather from "@expo/vector-icons/Feather"
 import { useNavigation } from "@react-navigation/native"
 
 import { getFontSize, getSpacing } from "../style"
-import { Navigation } from "../App"
+import { Navigation } from "../types/navigation"
 
 export type HeaderProps = {
   left?: ReactNode

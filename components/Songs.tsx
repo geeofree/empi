@@ -1,7 +1,5 @@
 import { FlatList } from "react-native"
-
-import { Song as SongType } from "../hooks/usePlaylists"
-
+import { Song as SongType } from "../types/playlist"
 import Song from './Song'
 
 export type SongsProps = {

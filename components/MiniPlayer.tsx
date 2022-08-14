@@ -4,8 +4,8 @@ import FeatherIcon from '@expo/vector-icons/Feather'
 
 import { useAudioPlayback } from "../hooks"
 import { colors, getFontSize, getSpacing } from "../style"
-import { Navigation } from "../App"
 import { getPercent } from "../utils/math"
+import { Navigation } from "../types/navigation"
 
 function MiniPlayer() {
   const { song, status, togglePlayback } = useAudioPlayback()

@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text } from "react-native"
-import { Song as SongType } from "../hooks/usePlaylists"
 import { colors, getSpacing } from "../style"
+import { Song as SongType } from "../types/playlist"
 
 export type SongProps = {
   song: SongType

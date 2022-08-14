@@ -1,17 +1,10 @@
 import { NavigationContainer } from '@react-navigation/native'
-import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useFonts } from 'expo-font'
 
 import { Playlist, Playlists, Playing } from './screens';
 import { useAudioPlayback } from './hooks';
-
-export type AppScreenParams = {
-  Playlist: undefined
-  Playlists: undefined
-  Playing: undefined
-}
-
-export type Navigation = NativeStackNavigationProp<AppScreenParams>
+import { AppScreenParams } from './types/navigation';
 
 const { Screen, Navigator } = createNativeStackNavigator<AppScreenParams>()
 
