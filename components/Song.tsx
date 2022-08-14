@@ -17,7 +17,11 @@ function Song(props: SongProps) {
   }
 
   return (
-    <Pressable style={styles.container} onPress={() => onPress(song.id)}>
+    <Pressable
+      style={styles.container}
+      onPress={() => onPress(song.id)}
+      android_ripple={styles.ripple}
+    >
       <Text style={[styles.title, isPlayingStyle]}>{song.title}</Text>
       <Text style={styles.artist}>{song.artist}</Text>
     </Pressable>
@@ -27,6 +31,9 @@ function Song(props: SongProps) {
 const styles = StyleSheet.create({
   container: {
     padding: getSpacing(4),
+  },
+  ripple: {
+    color: colors.normal.light,
   },
   title: {
     fontSize: getSpacing(4),

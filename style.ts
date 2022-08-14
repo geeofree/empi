@@ -13,7 +13,7 @@ export const colors = {
     magenta: '#957fb8',
     cyan:    '#6a9589',
     white:   '#c8c093',
-    light:   '#e9e9e9',
+    light:   '#d7d7d7',
   },
 
   bright: {
