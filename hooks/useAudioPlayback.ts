@@ -39,7 +39,7 @@ export type PlaybackStore = {
   /** The current playback instance */
   playbackInstance: Audio.Sound | null
 
-  /** Set the playback status */
+  /** Set the current song */
   setSong: (song: Song) => void
 
   /** Set the playback status */
@@ -48,7 +48,7 @@ export type PlaybackStore = {
   /** Set the playback instance */
   setPlaybackInstance: (playbackInstance: Audio.Sound) => void
 
-  /** Switches playback modes */
+  /** Switches/cycles through the playback modes */
   switchPlaybackMode: () => void
 }
 
