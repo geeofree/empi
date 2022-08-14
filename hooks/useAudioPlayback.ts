@@ -4,11 +4,11 @@ import { useEffect } from "react";
 import create from "zustand";
 import usePlaylists, { Song } from "./usePlaylists";
 
-export enum PLAYBACK_MODE_STATE {
-  PLAYLIST,
-  REPEAT_PLAYLIST,
-  REPEAT_SONG,
-  SHUFFLE_PLAYLIST,
+export const PLAYBACK_MODE_STATE = {
+  PLAYLIST: 'PLAYLIST',
+  REPEAT_PLAYLIST: 'REPEAT_PLAYLIST',
+  REPEAT_SONG: 'REPEAT_SONG',
+  SHUFFLE_PLAYLIST: 'SHUFFLE_PLAYLIST',
 }
 
 type PlaybackModeIcon = "play" | "repeat" | "play-circle" | "shuffle"
@@ -106,8 +106,6 @@ const DEFAULT_SONG = {
   artist: '',
 }
 
-const getPlaybackModeState = (state: number): PlaybackModeState => PLAYBACK_MODE_STATE[state] as PlaybackModeState
-
 function useAudioPlayback() {
   const playback = usePlaybackStore()
   const playlist = usePlaylists()
@@ -202,24 +200,22 @@ function useAudioPlayback() {
   const handlePlaybackModes = () => {
     if (!playback.status?.didJustFinish) return
 
-    if (playback.mode.state === getPlaybackModeState(PLAYBACK_MODE_STATE.REPEAT_SONG)) {
-      replayAudio()
-      return
-    }
+    switch (playback.mode.state) {
+      case PLAYBACK_MODE_STATE.REPEAT_SONG:
+        replayAudio()
+        return
 
-    if (playback.mode.state === getPlaybackModeState(PLAYBACK_MODE_STATE.PLAYLIST)) {
-      playNext({ shouldCycle: false })
-      return
-    }
+      case PLAYBACK_MODE_STATE.PLAYLIST:
+        playNext({ shouldCycle: false })
+        return
 
-    if (playback.mode.state === getPlaybackModeState(PLAYBACK_MODE_STATE.REPEAT_PLAYLIST)) {
-      playNext({ shouldCycle: true })
-      return
-    }
+      case PLAYBACK_MODE_STATE.REPEAT_PLAYLIST:
+        playNext({ shouldCycle: true })
+        return
 
-    if (playback.mode.state === getPlaybackModeState(PLAYBACK_MODE_STATE.SHUFFLE_PLAYLIST)) {
-      shufflePlay()
-      return
+      case PLAYBACK_MODE_STATE.SHUFFLE_PLAYLIST:
+        shufflePlay()
+        return
     }
   }
 
