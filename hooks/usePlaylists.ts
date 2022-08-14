@@ -1,5 +1,5 @@
 import create from "zustand";
-import { set, get } from 'lodash/fp'
+import { set, get, uniq } from 'lodash/fp'
 import { StorageAccessFramework } from "expo-file-system";
 import 'react-native-get-random-values'
 import { nanoid } from 'nanoid'
@@ -18,6 +18,7 @@ const usePlaylistStore = create<PlaylistStore>((setState, getState) => ({
   currentPlaylist: DEFAULT_PLAYLIST_KEY,
   songs: [],
   playlists: {},
+  selected: null,
   getCurrentPlaylist: () => {
     const { currentPlaylist, playlists, songs } = getState()
     const playlist = get(currentPlaylist, playlists)
@@ -82,12 +83,34 @@ const usePlaylistStore = create<PlaylistStore>((setState, getState) => ({
 
     getState().setSongs(songs)
     getState().addToPlayList(defaultPlaylistSongIDs, DEFAULT_PLAYLIST_KEY, DEFAULT_PLAYLIST_NAME)
-  }
+  },
+  toggleSelected: (songID) => {
+    setState(state => {
+      if (state.selected === null) return state
+
+      const alreadySelectedIndex = state.selected.indexOf(songID)
+      const isAlreadySelected = alreadySelectedIndex > -1
+
+      if (isAlreadySelected) {
+        const newSelected = state.selected.slice()
+        newSelected.splice(alreadySelectedIndex, 1)
+        const newState = set('selected', newSelected, state)
+        return newState
+      }
+
+      const newSelected = state.selected.concat(songID)
+      const newState = set('selected', newSelected, state)
+      return newState
+    })
+  },
+  toggleSelection: () => setState(state => set('selected', state.selected ? null : [], state))
 }))
 
 function usePlaylists() {
   const playlist = usePlaylistStore()
-  return playlist
+  const isSelecting = playlist.selected !== null && playlist.selected.length >= 0
+  const isSelected = (songID: string) => playlist.selected?.includes(songID)
+  return { isSelecting, isSelected, ...playlist }
 }
 
 export default usePlaylists

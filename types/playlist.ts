@@ -19,6 +19,7 @@ export type CurrentPlaylist = Playlist & { songs: Song[] }
 export type PlaylistStore = {
   currentPlaylist: string
   songs: Song[]
+  selected: string[] | null
   playlists: Playlists
   setSongs: (songs: Song[]) => void
   createPlaylist: (playlistKey: string, playlistName: string) => void
@@ -26,4 +27,6 @@ export type PlaylistStore = {
   setDefaultPlaylist: () => void
   getCurrentPlaylist: () => CurrentPlaylist
   setCurrentPlaylist: (playlistKey: string) => void
+  toggleSelected: (songID: string) => void
+  toggleSelection: () => void
 }
