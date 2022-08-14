@@ -23,7 +23,7 @@ export type PlaybackMode = {
 }
 
 export type PlaybackModeMachine = {
-  [key: string]: PlaybackMode
+  [key in PlaybackModeState]: PlaybackMode
 }
 
 export type PlaybackStore = {
@@ -57,12 +57,6 @@ const PLAYBACK_MODE: PlaybackModeMachine = {
     state: "PLAYLIST",
     icon: "play",
     name: "Playlist",
-    next: "REPEAT_SONG"
-  },
-  REPEAT_SONG: {
-    state: "REPEAT_SONG",
-    icon: "play-circle",
-    name: "Repeat Song",
     next: "REPEAT_PLAYLIST"
   },
   REPEAT_PLAYLIST: {
@@ -75,8 +69,14 @@ const PLAYBACK_MODE: PlaybackModeMachine = {
     state: "SHUFFLE_PLAYLIST",
     icon: "shuffle",
     name: "Shuffle Playlist",
+    next: "REPEAT_SONG"
+  },
+  REPEAT_SONG: {
+    state: "REPEAT_SONG",
+    icon: "play-circle",
+    name: "Repeat Song",
     next: "PLAYLIST"
-  }
+  },
 }
 
 const usePlaybackStore = create<PlaybackStore>((setState, getState) => ({
