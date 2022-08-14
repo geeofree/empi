@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native"
 import Feather from "@expo/vector-icons/Feather"
 import { useAudioPlayback } from "../hooks"
 import { colors, getFontSize, getSpacing } from "../style"
-import { getPercent } from "../utils/math"
+import { getPercent, getTimeFromUnixTimestamp } from "../utils/math"
 
 function Player() {
   const {
@@ -17,10 +17,13 @@ function Player() {
 
   if (!(status && song)) return null
 
-  const progress = getPercent(status.positionMillis, status.playableDurationMillis)
+  const progress = getPercent(status.positionMillis, status.durationMillis)
   const progressWidth = {
     width: `${progress}%`,
   }
+
+  const duration = getTimeFromUnixTimestamp(status.durationMillis)
+  const position = getTimeFromUnixTimestamp(status.positionMillis)
 
   return (
     <View>
@@ -29,8 +32,12 @@ function Player() {
         <Text style={styles.artist}>{song.artist}</Text>
       </View>
 
-      <View style={styles.progress}>
-        <View style={[styles.progressBar, progressWidth]} />
+      <View style={styles.timeControls}>
+        <Text style={styles.timeText}>{position}</Text>
+        <View style={styles.progress}>
+          <View style={[styles.progressBar, progressWidth]} />
+        </View>
+        <Text style={styles.timeText}>{duration}</Text>
       </View>
 
       <View style={styles.controls}>
@@ -79,13 +86,23 @@ const styles = StyleSheet.create({
     color: colors.bright.black,
   },
 
+  timeControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  timeText: {
+    fontSize: getFontSize(1),
+    fontFamily: 'Inter',
+  },
   progress: {
+    flex: 1,
     height: getSpacing(4),
     backgroundColor: colors.bright.light,
     borderRadius: getSpacing(3),
     borderWidth: 1,
     borderColor: colors.normal.light,
-    overflow: "hidden"
+    overflow: "hidden",
+    marginHorizontal: getSpacing(2),
   },
   progressBar: {
     backgroundColor: colors.normal.blue,
